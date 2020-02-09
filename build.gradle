@@ -1,0 +1,16 @@
+// treat this as a stand-alone project if not used in big scraper project
+if (findProject(':scraper-plugins') == null) {
+    apply from: 'gradle/scraper-plugin.gradle'
+    apply from: 'gradle/gradle-module-fix.gradle'
+}
+
+dependencies {
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4'
+
+    // put your dependencies here
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.+'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
+
+    // websocket
+    implementation 'org.java-websocket:Java-WebSocket:1.4.0'
+}
