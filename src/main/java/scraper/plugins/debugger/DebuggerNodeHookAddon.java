@@ -6,12 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scraper.annotations.ArgsCommand;
 import scraper.api.di.DIContainer;
+import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
-import scraper.api.node.NodeHook;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.Node;
 import scraper.api.plugin.Addon;
+import scraper.api.plugin.NodeHook;
 import scraper.utils.StringUtil;
+
+import java.util.Map;
 
 
 @ArgsCommand(
@@ -50,6 +53,16 @@ public class DebuggerNodeHookAddon implements NodeHook, Addon {
         }
     }
 
+    @Override
+    public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) throws NodeException {
+        if(debugger != null) {
+            try {
+                debugger.debugger.get().send(m.writeValueAsString(Map.of("map", o.getId(), "finished", true)));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     @Override
     public void load(DIContainer loadedDependencies, String[] args) {

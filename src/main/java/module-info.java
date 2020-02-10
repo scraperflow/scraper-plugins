@@ -1,5 +1,5 @@
-import scraper.api.node.NodeHook;
 import scraper.api.plugin.Addon;
+import scraper.api.plugin.NodeHook;
 import scraper.plugins.debugger.DebuggerNodeHookAddon;
 
 // modules need a unique name
