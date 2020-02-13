@@ -29,6 +29,11 @@ import java.util.regex.Pattern;
         example = "scraper app.scrape debug"
 )
 @ArgsCommand(
+        value = "debug-ip",
+        doc = "Binding ip for debugging. Default is 0.0.0.0",
+        example = "scraper app.scrape debug debug-ip:0.0.0.0"
+)
+@ArgsCommand(
         value = "debug-port",
         doc = "Port for debugging. Default is 8890",
         example = "scraper app.scrape debug debug-port:8890"
@@ -41,8 +46,6 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     private Set<ScrapeSpecification> specs = new HashSet<>();
 
     private final DebuggerState state = new DebuggerState();
-
-
 
     @Override
     public void accept(NodeContainer<? extends Node> n, FlowMap o) {
@@ -74,14 +77,13 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
         if (StringUtil.getArgument(args, "debug") != null) {
             l.warn("Debugging activated");
             String debugPort = StringUtil.getArgument(args, "debug-port");
-            if(debugPort == null) {
-                l.warn("Using default port 8890 for debugging");
-                debugger = new DebuggerWebsocketServer( this, 8890);
-            } else {
-                int port = Integer.parseInt(debugPort);
-                l.warn("Using port {} for debugging", port);
-                debugger = new DebuggerWebsocketServer(this, port);
-            }
+            String debugIp = StringUtil.getArgument(args, "debug-ip");
+            String bindingIp = "0.0.0.0";
+            int port = 8890;
+            if(debugPort != null) port = Integer.parseInt(debugPort);
+            if(debugIp != null) bindingIp = debugIp;
+
+            debugger = new DebuggerWebsocketServer( this, port, bindingIp);
         }
     }
 

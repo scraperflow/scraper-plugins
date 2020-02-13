@@ -27,8 +27,8 @@ public class DebuggerWebsocketServer extends WebSocketServer {
 
     ObjectMapper m = new ObjectMapper();
 
-    public DebuggerWebsocketServer(DebuggerNodeHookAddon actions, int port) {
-        super(new InetSocketAddress(port));
+    public DebuggerWebsocketServer(DebuggerNodeHookAddon actions, int port, String bindingIp) {
+        super(new InetSocketAddress(bindingIp, port));
         this.actions = actions;
         this.setReuseAddr(true);
         this.start();
