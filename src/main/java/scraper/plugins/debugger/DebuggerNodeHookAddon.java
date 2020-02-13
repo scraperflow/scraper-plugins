@@ -6,15 +6,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scraper.annotations.ArgsCommand;
 import scraper.api.di.DIContainer;
-import scraper.api.exceptions.NodeException;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.Node;
 import scraper.api.plugin.Addon;
+import scraper.api.plugin.Hook;
 import scraper.api.plugin.NodeHook;
+import scraper.api.specification.ScrapeInstance;
+import scraper.api.specification.ScrapeSpecification;
 import scraper.utils.StringUtil;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 @ArgsCommand(
@@ -27,40 +33,39 @@ import java.util.Map;
         doc = "Port for debugging. Default is 8890",
         example = "scraper app.scrape debug debug-port:8890"
 )
-public class DebuggerNodeHookAddon implements NodeHook, Addon {
-
+public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     /** Logger with the actual class name */
     protected Logger l = LoggerFactory.getLogger("Debugger");
-
     protected DebuggerWebsocketServer debugger;
-
     private final ObjectMapper m = new ObjectMapper();
+    private Set<ScrapeSpecification> specs = new HashSet<>();
+
+    private final DebuggerState state = new DebuggerState();
+
+
 
     @Override
     public void accept(NodeContainer<? extends Node> n, FlowMap o) {
         if(debugger != null) {
-            debugger.waitForReady();
-            debugger.checkBreakpoint(n);
+            state.waitUntilReady();
 
-            try {
-                // top hack
-                o.put("$origin", n.getAddress().toString());
-                debugger.debugger.get().send(m.writeValueAsString(o));
-                o.remove("$origin");
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            debugger.get().ifPresent(client -> {
+                client.send(wrap("nodePre", Map.of("nodeId", n.getAddress().getRepresentation(), "flowMap", o)));
+
+                state.waitIfBreakpoint(n,
+                        () -> client.send(wrap("breakpoint", Map.of("flowId", o.getId()))),
+                        () -> client.send(wrap("breakpointContinue", Map.of("flowId", o.getId())))
+                );
+            });
         }
     }
 
     @Override
-    public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) throws NodeException {
+    public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) {
+        state.waitUntilReady();
+
         if(debugger != null) {
-            try {
-                debugger.debugger.get().send(m.writeValueAsString(Map.of("map", o.getId(), "finished", true)));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            wrap("nodePost", Map.of("nodeId", n.getAddress().getRepresentation(), "flowMap", o));
         }
     }
 
@@ -71,13 +76,57 @@ public class DebuggerNodeHookAddon implements NodeHook, Addon {
             String debugPort = StringUtil.getArgument(args, "debug-port");
             if(debugPort == null) {
                 l.warn("Using default port 8890 for debugging");
-                debugger = new DebuggerWebsocketServer( 8890);
+                debugger = new DebuggerWebsocketServer( this, 8890);
             } else {
                 int port = Integer.parseInt(debugPort);
                 l.warn("Using port {} for debugging", port);
-                debugger = new DebuggerWebsocketServer(port);
+                debugger = new DebuggerWebsocketServer(this, port);
             }
         }
     }
+
+    @Override
+    public void execute(DIContainer dependencies, String[] args, Map<ScrapeSpecification, ScrapeInstance> scraper) {
+        scraper.forEach((s,i) -> specs.add(s));
+    }
+
+    private String wrap(String type, Object data) {
+        try {
+            return m.writeValueAsString(Map.of("type", type, "data", data));
+        } catch (JsonProcessingException e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
+
+    //======================
+    // CLIENT API
+    //======================
+
+    @SuppressWarnings("unused") // reflection
+    public void requestSpecificatios(Map<String, Object> data) {
+        l.info("Requesting specifications");
+        for (ScrapeSpecification specc : specs) {
+            debugger.get().ifPresent(client -> client.send(wrap("specification", specc)));
+        }
+    }
+
+    @SuppressWarnings("unused") // reflection
+    public void setReady(Map<String, Object> data) {
+        l.info("Debugger is ready, waking up all flows");
+        state.setReady(true);
+
+    }
+
+    @SuppressWarnings({"unused", "unchecked"}) // reflection
+    public void setBreakpoints(Map<String, Object> data) {
+        List<String> breakpoints = (List<String>) data.get("breakpoints");
+
+        breakpoints.forEach(b -> {
+            Pattern p = Pattern.compile("<?(\\w*\\.\\w*\\.\\w*)>?");
+            p.matcher(b).results().map(m -> m.group(1)).forEach(state::addBreakpoint);
+        });
+    }
+
 }
 
