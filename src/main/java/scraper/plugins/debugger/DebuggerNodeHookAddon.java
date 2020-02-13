@@ -90,6 +90,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     @Override
     public void execute(DIContainer dependencies, String[] args, Map<ScrapeSpecification, ScrapeInstance> scraper) {
         scraper.forEach((s,i) -> specs.add(s));
+        scraper.forEach((s,i) -> impls.add(i));
     }
 
     private String wrap(String type, Object data) {
