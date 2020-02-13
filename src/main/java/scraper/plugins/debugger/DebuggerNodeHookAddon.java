@@ -65,9 +65,8 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
 
     @Override
     public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) {
-        state.waitUntilReady();
-
         if(debugger != null) {
+            state.waitUntilReady();
             wrap("nodePost", Map.of("nodeId", n.getAddress().getRepresentation(), "flowMap", o));
         }
     }
