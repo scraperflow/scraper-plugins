@@ -16,7 +16,7 @@ public class InstanceDTO {
     public String getName() { return name; }
     public Map<String, Object> getEntryArguments() { return entryArguments; }
     public Map<String, InstanceDTO> getImportedInstances() { return importedInstances; }
-    public Map<String, NodeDTO> getNodes() { return routes; }
+    public Map<String, NodeDTO> getRoutes() { return routes; }
 
     public InstanceDTO(ScrapeInstance i) {
         this.name = i.getName();
