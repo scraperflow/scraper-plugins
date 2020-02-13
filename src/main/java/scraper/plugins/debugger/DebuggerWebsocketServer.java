@@ -103,11 +103,8 @@ public class DebuggerWebsocketServer extends WebSocketServer {
             cmdMethod.invoke(actions, data);
 
         } catch (Exception e) {
-            l.error("Not a valid command: {}", message.substring(0,100));
+            l.error("Not a valid command: {}", message.substring(0,Math.min(message.length(),100)));
         }
-
-
-
     }
 
 
