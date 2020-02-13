@@ -44,6 +44,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     protected DebuggerWebsocketServer debugger;
     private final ObjectMapper m = new ObjectMapper();
     private Set<ScrapeSpecification> specs = new HashSet<>();
+    private Set<ScrapeInstance> impls = new HashSet<>();
 
     private final DebuggerState state = new DebuggerState();
 
@@ -109,6 +110,10 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
         l.info("Requesting specifications");
         for (ScrapeSpecification specc : specs) {
             debugger.get().ifPresent(client -> client.send(wrap("specification", specc)));
+        }
+
+        for (ScrapeInstance impls : impls) {
+            debugger.get().ifPresent(client -> client.send(wrap("instance", impls)));
         }
     }
 
