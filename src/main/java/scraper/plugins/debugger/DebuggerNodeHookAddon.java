@@ -105,7 +105,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     //======================
 
     @SuppressWarnings("unused") // reflection
-    public void requestSpecificatios(Map<String, Object> data) {
+    public void requestSpecifications(Map<String, Object> data) {
         l.info("Requesting specifications");
         for (ScrapeSpecification specc : specs) {
             debugger.get().ifPresent(client -> client.send(wrap("specification", specc)));
