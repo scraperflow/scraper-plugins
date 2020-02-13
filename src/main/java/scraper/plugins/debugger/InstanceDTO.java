@@ -10,19 +10,19 @@ public class InstanceDTO {
 
     private final String name;
     private final Map<String, Object> entryArguments;
-    private final Map<Address, InstanceDTO> importedInstances = new HashMap<>();
-    private final Map<Address, NodeDTO> nodes = new HashMap<>();
+    private final Map<String, InstanceDTO> importedInstances = new HashMap<>();
+    private final Map<String, NodeDTO> routes = new HashMap<>();
 
     public String getName() { return name; }
     public Map<String, Object> getEntryArguments() { return entryArguments; }
-    public Map<Address, InstanceDTO> getImportedInstances() { return importedInstances; }
-    public Map<Address, NodeDTO> getNodes() { return nodes; }
+    public Map<String, InstanceDTO> getImportedInstances() { return importedInstances; }
+    public Map<String, NodeDTO> getNodes() { return routes; }
 
     public InstanceDTO(ScrapeInstance i) {
         this.name = i.getName();
         this.entryArguments = i.getEntryArguments();
 
-        i.getRoutes().forEach((address, nodeContainer) -> nodes.put(address, new NodeDTO(nodeContainer)));
-        i.getImportedInstances().forEach((adr, impl) -> importedInstances.put(adr, new InstanceDTO(impl)));
+        i.getRoutes().forEach((address, nodeContainer) -> routes.put(address.toString(), new NodeDTO(nodeContainer)));
+        i.getImportedInstances().forEach((adr, impl) -> importedInstances.put(adr.toString(), new InstanceDTO(impl)));
     }
 }
