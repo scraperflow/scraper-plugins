@@ -43,8 +43,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     protected Logger l = LoggerFactory.getLogger("Debugger");
     protected DebuggerWebsocketServer debugger;
     private final ObjectMapper m = new ObjectMapper();
-    private Set<ScrapeSpecification> specs = new HashSet<>();
-    private Set<ScrapeInstance> impls = new HashSet<>();
+    private Set<InstanceDTO> impls = new HashSet<>();
 
     private final DebuggerState state = new DebuggerState();
 
@@ -89,8 +88,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
 
     @Override
     public void execute(DIContainer dependencies, String[] args, Map<ScrapeSpecification, ScrapeInstance> scraper) {
-        scraper.forEach((s,i) -> specs.add(s));
-        scraper.forEach((s,i) -> impls.add(i));
+        scraper.forEach((s,i) -> impls.add(new InstanceDTO(i)));
     }
 
     private String wrap(String type, Object data) {
@@ -109,11 +107,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     @SuppressWarnings("unused") // reflection
     public void requestSpecifications(Map<String, Object> data) {
         l.info("Requesting specifications");
-        for (ScrapeSpecification specc : specs) {
-            debugger.get().ifPresent(client -> client.send(wrap("specification", specc)));
-        }
-
-        for (ScrapeInstance impls : impls) {
+        for (InstanceDTO impls : impls) {
             debugger.get().ifPresent(client -> client.send(wrap("instance", impls)));
         }
     }
