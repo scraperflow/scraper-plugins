@@ -97,7 +97,6 @@ public class DebuggerWebsocketServer extends WebSocketServer {
             String cmd = (String) request.get("command");
             //noinspection unchecked convention
             Map<String, Object> data = (Map<String, Object>) request.get("data");
-            System.out.println(actions.getClass());
 
             Method cmdMethod = actions.getClass().getMethod(cmd, Map.class);
             cmdMethod.invoke(actions, data);

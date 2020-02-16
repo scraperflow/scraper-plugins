@@ -53,7 +53,10 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
             state.waitUntilReady();
 
             debugger.get().ifPresent(client -> {
-                client.send(wrap("nodePre", Map.of("nodeId", n.getAddress().getRepresentation(), "flowMap", o)));
+                String wrapped = (wrap("nodePre", Map.of("nodeId", n.getAddress().toString(), "flowMap", new FlowMapDTO(o))));
+                client.send(wrapped);
+
+
 
                 state.waitIfBreakpoint(n,
                         () -> client.send(wrap("breakpoint", Map.of("flowId", o.getId()))),
@@ -67,7 +70,9 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) {
         if(debugger != null) {
             state.waitUntilReady();
-            wrap("nodePost", Map.of("nodeId", n.getAddress().getRepresentation(), "flowMap", o));
+            debugger.get().ifPresent(client ->
+                    client.send(wrap("nodePost", Map.of("nodeId", n.getAddress().toString(), "flowMap", new FlowMapDTO(o))))
+            );
         }
     }
 
