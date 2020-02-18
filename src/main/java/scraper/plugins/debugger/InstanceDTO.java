@@ -26,7 +26,11 @@ public class InstanceDTO {
         this.name = i.getName();
         this.entryArguments = i.getEntryArguments();
 
-        this.entry = i.getEntry().getAddress().toString();
+        if(i.getEntry() != null) {
+            this.entry = i.getEntry().getAddress().toString();
+        } else {
+            this.entry = null;
+        }
         i.getRoutes().forEach((address, nodeContainer) -> routes.put(address.toString(), new NodeDTO(nodeContainer)));
         i.getImportedInstances().forEach((adr, impl) -> importedInstances.put(adr.toString(), new InstanceDTO(impl)));
     }
