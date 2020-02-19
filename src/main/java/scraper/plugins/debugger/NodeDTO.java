@@ -5,6 +5,7 @@ import scraper.api.node.type.Node;
 
 import java.util.Map;
 
+@SuppressWarnings("unused") // DTO
 public class NodeDTO {
     private final Map<String, ?> nodeConfiguration;
     private final String address;

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
+@SuppressWarnings("unchecked") // API conventions
 public class DebuggerWebsocketServer extends WebSocketServer {
 
     protected Logger l = LoggerFactory.getLogger("DebuggerWebSocket");
@@ -92,10 +93,8 @@ public class DebuggerWebsocketServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         try {
-            //noinspection unchecked convention
             Map<String, Object> request = m.readValue(message, Map.class);
             String cmd = (String) request.get("command");
-            //noinspection unchecked convention
             Map<String, Object> data = (Map<String, Object>) request.get("data");
 
             Method cmdMethod = actions.getClass().getMethod(cmd, Map.class);

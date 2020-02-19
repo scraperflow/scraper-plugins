@@ -1,13 +1,11 @@
 package scraper.plugins.debugger;
 
-import scraper.api.node.Address;
 import scraper.api.specification.ScrapeInstance;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused") // DTO
 public class InstanceDTO {
 
     private final String name;
@@ -26,8 +24,8 @@ public class InstanceDTO {
         this.name = i.getName();
         this.entryArguments = i.getEntryArguments();
 
-        if(i.getEntry() != null) {
-            this.entry = i.getEntry().getAddress().toString();
+        if(i.getEntry().isPresent()) {
+            this.entry = i.getEntry().get().getAddress().toString();
         } else {
             this.entry = null;
         }
