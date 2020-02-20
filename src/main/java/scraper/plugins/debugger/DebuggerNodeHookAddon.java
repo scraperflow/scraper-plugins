@@ -55,10 +55,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
 
             debugger.get().ifPresent(client -> {
                 String wrapped = (wrap("nodePre", Map.of("nodeId", n.getAddress().toString(), "flowMap", new FlowMapDTO(o))));
-                System.out.println(wrapped);
                 client.send(wrapped);
-
-
 
                 state.waitIfBreakpoint(n,
                         () -> client.send(wrap("breakpoint", Map.of("flowId", o.getId()))),
