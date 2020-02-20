@@ -52,12 +52,13 @@ public class DebuggerState {
                     } catch (InterruptedException e) {
                         l.error("Continuing because interrupt");
                         e.printStackTrace();
+                    } finally {
+                        onContinue.run();
                     }
                 }
             }
         }
 
-        onContinue.run();
     }
 
     public void addBreakpoint(String br) {

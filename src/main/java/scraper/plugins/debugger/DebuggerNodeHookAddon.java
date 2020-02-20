@@ -48,12 +48,14 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     private final DebuggerState state = new DebuggerState();
 
     @Override
-    public void accept(NodeContainer<? extends Node> n, FlowMap o) {
+    public void accept(NodeContainer<? extends Node> n, FlowMap o2) {
+        FlowMap o = o2.copy();
         if(debugger != null) {
             state.waitUntilReady();
 
             debugger.get().ifPresent(client -> {
                 String wrapped = (wrap("nodePre", Map.of("nodeId", n.getAddress().toString(), "flowMap", new FlowMapDTO(o))));
+                System.out.println(wrapped);
                 client.send(wrapped);
 
 
