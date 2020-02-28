@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scraper.annotations.ArgsCommand;
+import scraper.annotations.NotNull;
 import scraper.api.di.DIContainer;
 import scraper.api.flow.FlowMap;
 import scraper.api.node.container.NodeContainer;
@@ -48,7 +49,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     private final DebuggerState state = new DebuggerState();
 
     @Override
-    public void accept(NodeContainer<? extends Node> n, FlowMap o2) {
+    public void beforeProcess(@NotNull NodeContainer<? extends Node> n, @NotNull FlowMap o2) {
         FlowMap o = o2.copy();
         if(debugger != null) {
             state.waitUntilReady();
@@ -66,7 +67,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     }
 
     @Override
-    public void acceptAfter(NodeContainer<? extends Node> n, FlowMap o) {
+    public void afterProcess(@NotNull NodeContainer<? extends Node> n, @NotNull FlowMap o) {
         if(debugger != null) {
             state.waitUntilReady();
             debugger.get().ifPresent(client ->
@@ -76,7 +77,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     }
 
     @Override
-    public void load(DIContainer loadedDependencies, String[] args) {
+    public void load(@NotNull DIContainer loadedDependencies, @NotNull String[] args) {
         if (StringUtil.getArgument(args, "debug") != null) {
             l.warn("Debugging activated");
             String debugPort = StringUtil.getArgument(args, "debug-port");
@@ -91,7 +92,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     }
 
     @Override
-    public void execute(DIContainer dependencies, String[] args, Map<ScrapeSpecification, ScrapeInstance> scraper) {
+    public void execute(@NotNull DIContainer dependencies, @NotNull String[] args, @NotNull Map<ScrapeSpecification, ScrapeInstance> scraper) {
         if (debugger != null) scraper.forEach((s,i) -> impls.add(new InstanceDTO(i)));
     }
 
