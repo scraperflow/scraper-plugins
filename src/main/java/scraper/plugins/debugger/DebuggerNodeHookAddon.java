@@ -41,8 +41,8 @@ import java.util.regex.Pattern;
 )
 public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     /** Logger with the actual class name */
-    protected Logger l = LoggerFactory.getLogger("Debugger");
-    protected DebuggerWebsocketServer debugger;
+    private Logger l = LoggerFactory.getLogger("Debugger");
+    private DebuggerWebsocketServer debugger;
     private final ObjectMapper m = new ObjectMapper();
     private Set<InstanceDTO> impls = new HashSet<>();
 
@@ -134,5 +134,9 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
         });
     }
 
+    @Override
+    public String toString() {
+        return "Debugger";
+    }
 }
 
