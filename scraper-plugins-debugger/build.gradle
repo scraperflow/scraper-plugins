@@ -4,6 +4,8 @@ if (findProject(':scraper-plugins') == null) {
     apply from: 'gradle/gradle-module-fix.gradle'
 }
 
+version = '0.1.0'
+
 dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4'
 
@@ -13,4 +15,16 @@ dependencies {
 
     // websocket
     implementation 'org.java-websocket:Java-WebSocket:1.4.0'
+}
+
+task bundleFatJar(type: Jar) { t ->
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+    from {
+        sourceSets.main.output
+    }
+
+    archiveFileName = "scraper-plugins-debugger-${version}.jar"
+    destinationDirectory = file("$rootDir/build/libs")
 }
