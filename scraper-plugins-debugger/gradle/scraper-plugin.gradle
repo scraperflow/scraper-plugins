@@ -6,3 +6,8 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
