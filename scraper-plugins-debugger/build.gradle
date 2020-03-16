@@ -14,12 +14,12 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
 
     // websocket
-    implementation 'org.java-websocket:Java-WebSocket:1.4.0'
+    provided 'org.java-websocket:Java-WebSocket:1.4.0'
 }
 
 task bundleFatJar(type: Jar) { t ->
     from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+        configurations.provided.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
     from {
         sourceSets.main.output
