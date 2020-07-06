@@ -7,8 +7,6 @@ import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.handshake.ServerHandshakeBuilder;
 import org.java_websocket.server.WebSocketServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -20,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("unchecked") // API conventions
 public class DebuggerWebsocketServer extends WebSocketServer {
 
-    protected Logger l = LoggerFactory.getLogger("DebuggerWebSocket");
+    protected System.Logger l = System.getLogger("DebuggerWebSocket");
 
     WebSocket debugger = null;
     final ReentrantLock lock = new ReentrantLock();
@@ -36,9 +34,8 @@ public class DebuggerWebsocketServer extends WebSocketServer {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                l.warn("Shutting down system");
+                l.log(System.Logger.Level.WARNING,"Shutting down system");
                 this.stop();
-                l.warn("Graceful shutdown");
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
@@ -68,7 +65,7 @@ public class DebuggerWebsocketServer extends WebSocketServer {
             lock.lock();
             debugger = conn;
         } finally { lock.unlock(); }
-        l.info("Debugger connected");
+        l.log(System.Logger.Level.INFO,"Debugger connected");
     }
 
     @Override
@@ -79,12 +76,12 @@ public class DebuggerWebsocketServer extends WebSocketServer {
         } finally {
             lock.unlock();
         }
-        l.warn("Debugger disconnected");
+        l.log(System.Logger.Level.INFO,"Debugger disconnected");
     }
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        l.error("Web Socket error", ex);
+        l.log(System.Logger.Level.ERROR,"Web Socket error", ex);
         // TODO implement error handling
         //      idea: stop execution until debugger reconnects
     }
@@ -101,7 +98,7 @@ public class DebuggerWebsocketServer extends WebSocketServer {
             cmdMethod.invoke(actions, data);
 
         } catch (Exception e) {
-            l.error("Not a valid command: {}", message.substring(0,Math.min(message.length(),100)));
+            l.log(System.Logger.Level.ERROR,"Not a valid command: {}", message.substring(0,Math.min(message.length(),100)));
         }
     }
 

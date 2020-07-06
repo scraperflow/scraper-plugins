@@ -1,7 +1,5 @@
 package scraper.plugins.debugger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scraper.api.node.Address;
 import scraper.api.node.container.NodeContainer;
 import scraper.api.node.type.Node;
@@ -10,8 +8,11 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+
 public class DebuggerState {
-    protected Logger l = LoggerFactory.getLogger("DebuggerState");
+    protected System.Logger l = System.getLogger("DebuggerState");
 
     // flows will wait on this object
     private final AtomicBoolean ready = new AtomicBoolean(false);
@@ -23,7 +24,7 @@ public class DebuggerState {
         try {
             synchronized (ready) {
                 if(!ready.get()) {
-                    l.info("Waiting for debugger to connect");
+                    l.log(INFO,"Waiting for debugger to connect");
                     ready.wait();
                 }
             }
@@ -43,14 +44,14 @@ public class DebuggerState {
         for (String breakpoint : breakpoints) {
             Address addr = n.addressOf(breakpoint);
             if(n.getAddress().equals(addr)) {
-                l.info("BREAKPOINT TRIGGERED: {} <-> {}", breakpoint, n.getAddress().getRepresentation());
+                l.log(INFO,"BREAKPOINT TRIGGERED: {} <-> {}", breakpoint, n.getAddress().getRepresentation());
                 synchronized (breaking) {
                     try {
                         onWait.run();
                         breaking.wait();
                         break;
                     } catch (InterruptedException e) {
-                        l.error("Continuing because interrupt");
+                        l.log(ERROR,"Continuing because interrupt");
                         e.printStackTrace();
                     } finally {
                         onContinue.run();

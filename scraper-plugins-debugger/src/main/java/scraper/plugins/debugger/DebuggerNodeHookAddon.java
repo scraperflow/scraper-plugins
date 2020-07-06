@@ -2,8 +2,6 @@ package scraper.plugins.debugger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scraper.annotations.ArgsCommand;
 import scraper.annotations.NotNull;
 import scraper.api.di.DIContainer;
@@ -23,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static java.lang.System.Logger.Level.INFO;
+
 
 @ArgsCommand(
         value = "debug",
@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 )
 public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     /** Logger with the actual class name */
-    private Logger l = LoggerFactory.getLogger("Debugger");
+    private final System.Logger l = System.getLogger("Debugger");
     private DebuggerWebsocketServer debugger;
     private final ObjectMapper m = new ObjectMapper();
     private Set<InstanceDTO> impls = new HashSet<>();
@@ -79,7 +79,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
     @Override
     public void load(@NotNull DIContainer loadedDependencies, @NotNull String[] args) {
         if (StringUtil.getArgument(args, "debug") != null) {
-            l.warn("Debugging activated");
+            l.log(System.Logger.Level.WARNING,"Debugging activated");
             String debugPort = StringUtil.getArgument(args, "debug-port");
             String debugIp = StringUtil.getArgument(args, "debug-ip");
             String bindingIp = "0.0.0.0";
@@ -111,7 +111,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
 
     @SuppressWarnings("unused") // reflection
     public void requestSpecifications(Map<String, Object> data) {
-        l.info("Requesting specifications");
+        l.log(INFO,"Requesting specifications");
         for (InstanceDTO impls : impls) {
             debugger.get().ifPresent(client -> client.send(wrap("instance", impls)));
         }
@@ -119,7 +119,7 @@ public class DebuggerNodeHookAddon implements NodeHook, Hook, Addon {
 
     @SuppressWarnings("unused") // reflection
     public void setReady(Map<String, Object> data) {
-        l.info("Debugger is ready, waking up all flows");
+        l.log(INFO,"Debugger is ready, waking up all flows");
         state.setReady(true);
 
     }

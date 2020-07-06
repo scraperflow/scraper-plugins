@@ -1,0 +1,3 @@
+rootProject.name = 'scraper-nodes'
+
+include 'scraper-plugins-debugger','scraper-plugins-persistent-proxy-scores'

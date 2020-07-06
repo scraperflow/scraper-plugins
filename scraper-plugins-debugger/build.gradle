@@ -1,30 +1,23 @@
-// treat this as a stand-alone project if not used in big scraper project
-if (findProject(':scraper-plugins') == null) {
-    apply from: 'gradle/scraper-plugin.gradle'
-    apply from: 'gradle/gradle-module-fix.gradle'
+plugins {
+    id 'java-library'
+    id 'java-library-distribution'
+    id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
 version = '0.1.0'
 
-dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4'
-
-    // put your dependencies here
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.+'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.+'
-
-    // websocket
-    provided 'org.java-websocket:Java-WebSocket:1.4.0'
+extraJavaModuleInfo {
+    module("Java-WebSocket-1.4.0.jar", "Java.Websocket", "1.4.0") {
+        exports "org.java_websocket"
+        exports "org.java_websocket.drafts"
+        exports "org.java_websocket.exceptions"
+        exports "org.java_websocket.handshake"
+        exports "org.java_websocket.server"
+    }
+    module("slf4j-api-1.7.25.jar", "org.slf4j", "1.7.25") {}
 }
 
-task bundleFatJar(type: Jar) { t ->
-    from {
-        configurations.provided.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-    from {
-        sourceSets.main.output
-    }
-
-    archiveFileName = "scraper-plugins-debugger-${version}.jar"
-    destinationDirectory = file("$rootDir/build/libs")
+dependencies {
+    // websocket
+    implementation 'org.java-websocket:Java-WebSocket:1.4.0'
 }

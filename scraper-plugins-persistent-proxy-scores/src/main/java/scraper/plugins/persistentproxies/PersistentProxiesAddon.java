@@ -1,7 +1,5 @@
 package scraper.plugins.persistentproxies;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scraper.annotations.ArgsCommand;
 import scraper.annotations.NotNull;
 import scraper.api.di.DIContainer;
@@ -13,6 +11,9 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+
 
 @ArgsCommand(
         value = "persistent-proxies:<PATH>",
@@ -21,7 +22,7 @@ import java.nio.file.Paths;
 )
 public class PersistentProxiesAddon implements Addon {
     /** Logger with the actual class name */
-    private Logger l = LoggerFactory.getLogger("PersistentProxies");
+    private System.Logger l = System.getLogger("PersistentProxies");
 
     @Override
     public void load(@NotNull DIContainer loadedDependencies, @NotNull String[] args) {
@@ -38,7 +39,7 @@ public class PersistentProxiesAddon implements Addon {
             try {
                 tryReadScores(proxy, persist);
             } catch (IOException e) {
-                l.error("Could not read input proxy scores", e);
+                l.log(ERROR,"Could not read input proxy scores", e);
             }
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -49,7 +50,7 @@ public class PersistentProxiesAddon implements Addon {
                         pw.println(group+">"+line);
                     })));
                 } catch (FileNotFoundException e) {
-                    l.error("Could not write scores to file");
+                    l.log(ERROR,"Could not write scores to file");
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }
@@ -57,9 +58,9 @@ public class PersistentProxiesAddon implements Addon {
                 File f_old = new File(Paths.get(persist, "proxy-scores.csv").toString());
                 boolean renamed = f.renameTo(f_old);
                 if(!renamed) {
-                    l.error("Could not finish rename operation {} -> {}", f, f_old);
+                    l.log(ERROR,"Could not finish rename operation {} -> {}", f, f_old);
                 } else {
-                    l.info("Persisted proxy scores successfully");
+                    l.log(INFO,"Persisted proxy scores successfully");
                 }
             }));
         }
@@ -70,12 +71,12 @@ public class PersistentProxiesAddon implements Addon {
 
         File f = new File(Paths.get(persist, "proxy-scores.csv").toString());
         if(f.exists()) {
-            l.info("Reading persistent scores at {}", f);
+            l.log(INFO,"Reading persistent scores at {}", f);
 
             Files.lines(Paths.get(persist, "proxy-scores.csv"))
                     .forEach(proxy::addProxyLine);
         } else {
-            l.info("No persistent scores found at {}", f);
+            l.log(INFO,"No persistent scores found at {}", f);
         }
     }
 
