@@ -21,8 +21,8 @@ public class FlowMapDTO {
     public String getFlowId() { return flowId; }
     public Integer getParentSequence() { return parentSequence; }
 
-    public FlowMapDTO(FlowMap o ) {
-        o.keySet().forEach(k -> content.put(k, o.get(k).orElse(null)));
+    public FlowMapDTO(FlowMap o) {
+        o.forEach((l,v) -> content.put(l.getLocation().getRaw().toString(), v));
         if(o.getParentId().isPresent()) {
             parentId = o.getParentId().get().toString();
             this.parentSequence = o.getParentSequence().get();

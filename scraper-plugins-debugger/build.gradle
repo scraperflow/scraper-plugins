@@ -4,7 +4,7 @@ plugins {
     id("de.jjohannes.extra-java-module-info") version "0.1"
 }
 
-version = '0.2.0'
+version = '0.3.0'
 
 extraJavaModuleInfo {
     module("Java-WebSocket-1.4.0.jar", "Java.Websocket", "1.4.0") {
