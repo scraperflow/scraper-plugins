@@ -16,7 +16,7 @@ subprojects {
 
     afterEvaluate {
         dependencies {
-            providedCompile 'com.github.scraperflow.scraper:core:v0.16.4'
+            providedCompile 'com.github.scraperflow.scraper:core:v0.17.0'
 
             testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
             testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.1'
